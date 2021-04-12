@@ -1,10 +1,24 @@
 import * as React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import { useKeyPress } from 'react-use';
+
+
 
 const BTN = () => {
   const downArrow = () => {
+    // useKeyPress('ArrowDown')
 
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      chrome.tabs.sendMessage(tabs[0].id, { message: '選択範囲ちょうだい' }, (item) => {
+        if (!item) {
+          alert('選択範囲が見つかりませんでした');
+          return;
+        } else {
+          alert(item);
+        }
+      });
+    });
   }
 
   return (
@@ -34,7 +48,7 @@ const App = () => {
         </a>
       </header>
 
-      <BTN/>
+      <BTN />
     </div>
   );
 };
