@@ -2,6 +2,8 @@ import * as React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { useKeyPress } from 'react-use';
+import { version } from '../package.json';
+
 
 
 
@@ -34,7 +36,7 @@ const App = () => {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <h1>VENUS4</h1>
+        <h1>VENUS {version}</h1>
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>

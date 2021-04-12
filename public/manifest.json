@@ -18,7 +18,10 @@
   "permissions": [
     "https://github.com/*",
     "https://book.dmm.com",
+    "activeTab",
+    "contextMenus",
     "tabs",
+    "pageCapture",
     "webNavigation"
   ],
   "background": {
