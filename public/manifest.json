@@ -1,8 +1,8 @@
 {
-  "name": "Chrome Extension Boilerplate",
+  "name": "screenshot of all pages",
   "description": "Chrome Extension boilerplate created with React Typescript.",
   "manifest_version": 2,
-  "version": "1.0.0",
+  "version": "0.202104.0",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
@@ -17,10 +17,10 @@
   },
   "permissions": [
     "https://github.com/*",
-    "https://book.dmm.com",
     "activeTab",
     "contextMenus",
     "tabs",
+    "debugger",
     "pageCapture",
     "webNavigation"
   ],

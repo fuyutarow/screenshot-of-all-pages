@@ -1,71 +1,155 @@
 import { version } from '../package.json';
 
-console.log("Hello from background script!", version)
-
+console.log('Hello from background script!', version);
 
 chrome.runtime.onInstalled.addListener(() => {
 
   // 親階層のメニューを生成
   const parent_menu = chrome.contextMenus.create({
-    type: "normal",
-    id: "parent",
-    title: "背景色を変えるメニュー"
+    type: 'normal',
+    id: 'parent',
+    title: '背景色を変えるメニュー',
   });
 
   //子階層のメニューを親(parent_menu)に追加
   chrome.contextMenus.create({
-    id: "red",
+    id: 'red',
     parentId: parent_menu,
-    title: "赤色"
+    title: '赤色',
   });
 
   chrome.contextMenus.create({
-    id: "blue",
+    id: 'blue',
     parentId: parent_menu,
-    title: "青色"
+    title: '青色',
   });
 
   chrome.contextMenus.create({
-    id: "alert",
+    id: 'alert',
     parentId: parent_menu,
-    title: "alert"
-  });
-  chrome.contextMenus.create({
-    id: "PageDown",
-    parentId: parent_menu,
-    title: "PageDown"
+    title: 'alert',
   });
 
   chrome.contextMenus.create({
-    id: "ArrowDown",
+    id: 'F12',
     parentId: parent_menu,
-    title: "ArrowDown"
+    title: 'F12',
+  });
+
+  chrome.contextMenus.create({
+    id: 'PageDown',
+    parentId: parent_menu,
+    title: 'PageDown',
+  });
+
+  chrome.contextMenus.create({
+    id: 'ArrowDown',
+    parentId: parent_menu,
+    title: 'ArrowDown',
   });
 });
 
+chrome.browserAction.onClicked.addListener((tab) => {
+  alert(tab);
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.pressEnter) {
+
+    chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+      const tab = tabs[0];
+
+      if (tab) {
+        // alert('send command')
+        const code = 'ArrowDown';
+        console.log(code);
+        chrome.debugger.attach({ tabId: tab.id }, '1.2');
+        // chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+        //   type: 'keyDown',
+        //   code,
+        // }, (res) => {
+        //   if (chrome.runtime.lastError) {
+        //     console.warn('Error sending the shortcut to active tab:', chrome.runtime.lastError)
+        //   }
+        // })
+        // chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+        //   type: 'keyUp',
+        //   code,
+        // }, (res) => {
+        //   if (chrome.runtime.lastError) {
+        //     console.warn('Error sending the shortcut to active tab:', chrome.runtime.lastError)
+        //   }
+        // })
+        chrome.debugger.detach({ tabId: tab.id });
+      }
+    });
+  }
+});
 
 chrome.contextMenus.onClicked.addListener((item) => {
-  console.log("メニューがクリックされたよ");
+  console.log('メニューがクリックされたよ');
 
   // 選ばれたメニューのidが item.menuItemId で取得できる
-  if (['PageDown', 'a', 'ArrowDown'].includes(item.menuItemId)) {
-    const code = `
-document.dispatchEvent(new KeyboardEvent('keydown',{'key': '${item.menuItemId}'}));
-    `;
-    chrome.tabs.executeScript({ code });
-    console.log(code)
+  if (['PageDown', 'F12', 'ArrowDown'].includes(item.menuItemId)) {
+    //     const code = `
+    // document.dispatchEvent(new KeyboardEvent('keydown',{'key': '${item.menuItemId}'}));
+    //     `;
+    //     //     const code = `
+    //     // var pressEvent = document.createEvent ('KeyboardEvent');
+    //     // pressEvent.initKeyEvent ('keydown', true, true, window, true, false, false, false, 34, 0);
+    //     // document.dispatchEvent (pressEvent);
+    //     //     `
+    // alert("OK#1")
+    // chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+    chrome.tabs.query({ active: true }, tabs => {
+      const tab = tabs[0];
+      if (tab) {
+        // alert("OK#2")
+        // const code = 'PageDown'
+        const code = 'ArrowDown';
+        // chrome.debugger.attach({ tabId: tab.id }, "1.0");
+        // chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+        //   type: 'keyDown', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13, macCharCode: 13
+        // });
+        // chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+        //   type: 'keyUp', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13, macCharCode: 13
+        // });
+        chrome.debugger.attach({ tabId: tab.id }, '1.2',);
+        chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+          type: 'keyUp',
+          code: 'PageDown',
+          key: 'PageDown',
+        }, (res) => {
+          if (chrome.runtime.lastError) {
+            console.warn('Error sending the shortcut to active tab:', chrome.runtime.lastError);
+          }
+          chrome.debugger.sendCommand({ tabId: tab.id }, 'Input.dispatchKeyEvent', {
+            type: 'keyDown',
+            code: 'PageDown',
+            key: 'PageDown',
+          }, (res) => {
+            if (chrome.runtime.lastError) {
+              console.warn('Error sending the shortcut to active tab:', chrome.runtime.lastError);
+            }
+          });
+        });
+        chrome.debugger.detach({ tabId: tab.id });
+      }
+    });
+    // chrome.tabs.executeScript({ code });
+    // console.log(code)
   } else if (['alert'].includes(item.menuItemId)) {
     const code = `
     alert("OKKO")
     `;
     chrome.tabs.executeScript({ code });
-    console.log(code)
+    console.log(code);
     // document.execCommand('insertText', false, 'myString')
 
   } else {
-    const code = `document.body.style.backgroundColor = '${item.menuItemId}'`
+    const code = `document.body.style.backgroundColor = '${item.menuItemId}'`;
     chrome.tabs.executeScript({ code });
-    console.log(code)
+    console.log(code);
   }
 });
 

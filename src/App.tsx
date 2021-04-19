@@ -1,11 +1,35 @@
-import * as React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import * as React from 'react';
+
+import logo from './logo.svg';
+
+import './App.css';
 import { useKeyPress } from 'react-use';
+
 import { version } from '../package.json';
 
+// const ButtonKeyEvent = () => {
+//   const downArrow = () => {
+//     // useKeyPress('ArrowDown')
 
+//     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+//       chrome.tabs.sendMessage(tabs[0].id, { type: 'dispathPageDown' }, (item) => {
+//         if (!item) {
+//           alert('選択範囲が見つかりませんでした');
+//           return;
+//         } else {
+//           alert(item);
+//         }
+//       });
+//     });
+//   }
 
+//   return (
+//     <button onClick={downArrow} >
+//       down
+//     </button>
+//   )
+
+// }
 
 const BTN = () => {
   const downArrow = () => {
@@ -14,22 +38,22 @@ const BTN = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       chrome.tabs.sendMessage(tabs[0].id, { message: '選択範囲ちょうだい' }, (item) => {
         if (!item) {
-          alert('選択範囲が見つかりませんでした');
+          // alert('選択範囲が見つかりませんでした');
           return;
         } else {
-          alert(item);
+          // alert(item);
         }
       });
     });
-  }
+  };
 
   return (
     <button onClick={downArrow} >
       down
     </button>
-  )
+  );
 
-}
+};
 
 const App = () => {
   return (
@@ -49,6 +73,21 @@ const App = () => {
           Learn React
         </a>
       </header>
+      <hr />
+      <button onClick={() => {
+        chrome.runtime.sendMessage({ pressEnter: true });
+      }}>pressEnter</button>
+
+      <hr />
+      toContent
+      <button onClick={() => {
+        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+          const tab = tabs[0];
+          if (tab.id) {
+            chrome.tabs.sendMessage(tab.id, { pressEnter: true });
+          }
+        });
+      }}>pressEnter</button>
 
       <BTN />
     </div>
